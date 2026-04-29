@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin User Detail - Employment Contract System</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #1f2a37;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --info: #0891b2;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: "Inter", "Noto Sans JP", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 270px minmax(680px, 1fr) 330px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .header {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #1e3a8a, #2563eb 70%);
+      color: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .title-block p {
+      margin: 6px 0 0;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.92rem;
+    }
+
+    .status-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .badge.primary { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.32);}
+    .badge.approval { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
+    .badge.progress { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
+    .header-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .meta-item .k {
+      display: block;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .meta-item .v {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .sidebar,
+    .right-panel {
+      position: sticky;
+      top: 20px;
+    }
+
+    .panel-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf1f7;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      background: #f8fafc;
+    }
+
+    .section-nav {
+      padding: 10px;
+      max-height: calc(100vh - 130px);
+      overflow: auto;
+    }
+
+    .section-nav a {
+      display: block;
+      text-decoration: none;
+      color: #334155;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin: 2px 0;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+    }
+
+    .section-nav a:hover {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+      transform: translateX(2px);
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf1f7;
+      padding: 18px;
+      scroll-margin-top: 24px;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h2::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      border-radius: 4px;
+      background: var(--primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      background: #fbfcff;
+      border: 1px solid #e6ebf3;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      min-height: 62px;
+    }
+
+    .field .label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .field .value {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .textarea-readonly {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      border: 1px solid #dbe3ef;
+      border-radius: 12px;
+      background: #f9fbff;
+      color: #0f172a;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+    }
+
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .doc-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .doc-preview {
+      height: 110px;
+      background: linear-gradient(180deg, #f8fafc, #edf2f7);
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .doc-body {
+      padding: 10px;
+    }
+
+    .doc-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    .doc-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #334155;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    .btn:hover {
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn.primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .timeline {
+      position: relative;
+      margin: 8px 0 0 8px;
+      padding-left: 18px;
+      border-left: 2px solid #dbeafe;
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      position: relative;
+      background: #f8fbff;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -26px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px #bfdbfe;
+    }
+
+    .timeline-item strong {
+      font-size: 0.9rem;
+      color: #0f172a;
+    }
+
+    .timeline-item .sub {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 3px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 740px;
+      background: #fff;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 0.86rem;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid #dbe3ef;
+      background: #f8fbff;
+      color: #334155;
+    }
+
+    .pill.new { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .pill.waiting { background: #fff7ed; color: #b45309; border-color: #fed7aa; }
+    .pill.approved { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
+    .pill.rejected { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .pill.signed { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    .pill.completed { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+
+    .action-group {
+      padding: 14px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .action-group .btn {
+      width: 100%;
+      text-align: center;
+      padding: 9px 10px;
+    }
+
+    .btn.success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn.warn { background: var(--warning); border-color: var(--warning); color: #fff; }
+    .btn.info { background: var(--info); border-color: var(--info); color: #fff; }
+
+    @media (max-width: 1320px) {
+      .page {
+        grid-template-columns: 230px 1fr;
+      }
+      .right-panel {
+        grid-column: 1 / -1;
+        position: static;
+      }
+      .header-grid {
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+      }
+      .grid {
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
+      }
+      .doc-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .page {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+      .sidebar, .right-panel {
+        position: static;
+      }
+      .header-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+      .grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+      .doc-grid {
+        grid-template-columns: 1fr;
+      }
+      .header-top {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .header-grid,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-top">
+        <div class="title-block">
+          <h1>EMP-2026-00487 | Takashi Yamamoto (山本 隆)</h1>
+          <p>Employment Contract & Document Distribution System - Admin User Detail</p>
+        </div>
+        <div class="status-badges">
+          <span class="badge primary">Current Status: Waiting</span>
+          <span class="badge approval">Approval Status: Approved</span>
+          <span class="badge progress">Contract: Pending Signature</span>
+        </div>
+      </div>
+      <div class="header-grid">
+        <div class="meta-item"><span class="k">Employee ID</span><span class="v">EMP-2026-00487</span></div>
+        <div class="meta-item"><span class="k">Full Name</span><span class="v">Takashi Yamamoto</span></div>
+        <div class="meta-item"><span class="k">Kana Name</span><span class="v">ヤマモト タカシ</span></div>
+        <div class="meta-item"><span class="k">Role</span><span class="v">Cast</span></div>
+        <div class="meta-item"><span class="k">Contract Number</span><span class="v">CNT-2026-1189</span></div>
+        <div class="meta-item"><span class="k">Contract Type</span><span class="v">Fixed-Term (1 Year)</span></div>
+        <div class="meta-item"><span class="k">Current Status</span><span class="v">Waiting</span></div>
+        <div class="meta-item"><span class="k">Approval Status</span><span class="v">Approved</span></div>
+        <div class="meta-item"><span class="k">Created At</span><span class="v">2026-04-12 09:20</span></div>
+        <div class="meta-item"><span class="k">Updated At</span><span class="v">2026-04-29 09:42</span></div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="panel-card">
+        <h3 class="panel-title">Section Navigation</h3>
+        <nav class="section-nav">
+          <a href="#basic-information">Basic Information</a>
+          <a href="#current-address">Current Address</a>
+          <a href="#emergency-contact">Emergency Contact</a>
+          <a href="#education-work-history">Education / Work History</a>
+          <a href="#bank-information">Bank Information</a>
+          <a href="#insurance">Insurance</a>
+          <a href="#family-spouse-information">Family / Spouse Information</a>
+          <a href="#other-information">Other Information</a>
+          <a href="#joining-date">Joining Date</a>
+          <a href="#visa-residence-information">Visa / Residence Information</a>
+          <a href="#salary-information">Salary Information</a>
+          <a href="#guarantor-information">Guarantor Information</a>
+          <a href="#documents">Documents</a>
+          <a href="#contract-information">Contract Information</a>
+          <a href="#admin-memo">Admin Memo</a>
+          <a href="#approval-history">Approval History</a>
+          <a href="#audit-log">Audit Log</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section id="basic-information" class="card">
+        <h2>Basic Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">First Name</span><div class="value">Takashi</div></div>
+          <div class="field"><span class="label">Last Name</span><div class="value">Yamamoto</div></div>
+          <div class="field"><span class="label">Gender</span><div class="value">Male</div></div>
+          <div class="field"><span class="label">Birthday</span><div class="value">1994-08-16</div></div>
+          <div class="field"><span class="label">Nationality</span><div class="value">Japanese</div></div>
+          <div class="field"><span class="label">Employee Number</span><div class="value">E-000487</div></div>
+          <div class="field"><span class="label">Department</span><div class="value">Operations</div></div>
+          <div class="field"><span class="label">Position</span><div class="value">Senior Field Coordinator</div></div>
+        </div>
+      </section>
+
+      <section id="current-address" class="card">
+        <h2>Current Address</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Postal Code</span><div class="value">160-0022</div></div>
+          <div class="field"><span class="label">Prefecture</span><div class="value">Tokyo</div></div>
+          <div class="field"><span class="label">City</span><div class="value">Shinjuku-ku</div></div>
+          <div class="field"><span class="label">Street</span><div class="value">Shinjuku 3-12-7</div></div>
+          <div class="field full"><span class="label">Building</span><div class="value">Sky Residence Shinjuku 804</div></div>
+        </div>
+      </section>
+
+      <section id="emergency-contact" class="card">
+        <h2>Emergency Contact</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Name</span><div class="value">Mika Yamamoto</div></div>
+          <div class="field"><span class="label">Relationship</span><div class="value">Sister</div></div>
+          <div class="field"><span class="label">Phone</span><div class="value">090-3345-8210</div></div>
+          <div class="field"><span class="label">Email</span><div class="value">mika.y@example.jp</div></div>
+          <div class="field full"><span class="label">Address</span><div class="value">2-6-15 Chuo, Saitama-shi, Saitama</div></div>
+        </div>
+      </section>
+
+      <section id="education-work-history" class="card">
+        <h2>Education / Work History</h2>
+        <div class="grid">
+          <div class="field full"><span class="label">Education</span><div class="value">B.A. in Business Administration, Meiji University (2017)</div></div>
+          <div class="field full"><span class="label">Previous Work Experience</span><div class="value">2017-2021: Sales Associate at Kanto Retail Group | 2021-2025: Team Supervisor at Zenith Logistics</div></div>
+        </div>
+      </section>
+
+      <section id="bank-information" class="card">
+        <h2>Bank Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Bank Name</span><div class="value">MUFG Bank</div></div>
+          <div class="field"><span class="label">Branch</span><div class="value">Shinjuku Branch (123)</div></div>
+          <div class="field"><span class="label">Account Number</span><div class="value">5483219</div></div>
+          <div class="field"><span class="label">Account Holder</span><div class="value">YAMAMOTO TAKASHI</div></div>
+        </div>
+      </section>
+
+      <section id="insurance" class="card">
+        <h2>Insurance</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Health Insurance</span><div class="value">Enrolled (Tokyo Health Union)</div></div>
+          <div class="field"><span class="label">Pension</span><div class="value">Category 2 - Active</div></div>
+          <div class="field"><span class="label">Employment Insurance</span><div class="value">Active</div></div>
+          <div class="field"><span class="label">Insurance Number</span><div class="value">INS-77-3921-84</div></div>
+        </div>
+      </section>
+
+      <section id="family-spouse-information" class="card">
+        <h2>Family / Spouse Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Spouse</span><div class="value">Married (Yuko Yamamoto)</div></div>
+          <div class="field"><span class="label">Children</span><div class="value">2</div></div>
+          <div class="field"><span class="label">Dependents</span><div class="value">3</div></div>
+          <div class="field"><span class="label">Family Contact</span><div class="value">03-6689-1123</div></div>
+        </div>
+      </section>
+
+      <section id="other-information" class="card">
+        <h2>Other Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Commute Method</span><div class="value">Train + Walk</div></div>
+          <div class="field"><span class="label">Commuting Time</span><div class="value">42 minutes</div></div>
+          <div class="field"><span class="label">Uniform Size</span><div class="value">L</div></div>
+          <div class="field"><span class="label">Laptop Assigned</span><div class="value">Yes (LT-OPS-204)</div></div>
+        </div>
+      </section>
+
+      <section id="joining-date" class="card">
+        <h2>Joining Date</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Offer Date</span><div class="value">2026-03-28</div></div>
+          <div class="field"><span class="label">Joining Date</span><div class="value">2026-05-01</div></div>
+          <div class="field"><span class="label">Probation Start</span><div class="value">2026-05-01</div></div>
+          <div class="field"><span class="label">Probation End</span><div class="value">2026-07-31</div></div>
+        </div>
+      </section>
+
+      <section id="visa-residence-information" class="card">
+        <h2>Visa / Residence Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Visa Type</span><div class="value">Engineer / Specialist in Humanities</div></div>
+          <div class="field"><span class="label">Expired Date</span><div class="value">2028-11-20</div></div>
+          <div class="field"><span class="label">Residence Card</span><div class="value">RC-8129-5551-3321</div></div>
+          <div class="field"><span class="label">Work Restriction</span><div class="value">None</div></div>
+        </div>
+      </section>
+
+      <section id="salary-information" class="card">
+        <h2>Salary Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Salary Type</span><div class="value">Monthly</div></div>
+          <div class="field"><span class="label">Monthly Salary</span><div class="value">JPY 385,000</div></div>
+          <div class="field"><span class="label">Bonus</span><div class="value">Twice per year</div></div>
+          <div class="field"><span class="label">Payment Method</span><div class="value">Bank Transfer</div></div>
+        </div>
+      </section>
+
+      <section id="guarantor-information" class="card">
+        <h2>Guarantor Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Name</span><div class="value">Kenji Sato</div></div>
+          <div class="field"><span class="label">Relationship</span><div class="value">Former Manager</div></div>
+          <div class="field"><span class="label">Phone</span><div class="value">080-2278-9912</div></div>
+          <div class="field"><span class="label">Address</span><div class="value">4-1-22 Midori, Chiba-shi, Chiba</div></div>
+        </div>
+      </section>
+
+      <section id="documents" class="card">
+        <h2>Documents</h2>
+        <div class="doc-grid">
+          <div class="doc-card">
+            <div class="doc-preview">Passport Preview</div>
+            <div class="doc-body">
+              <div class="doc-title">Passport.pdf</div>
+              <div class="doc-actions">
+                <button class="btn">Preview</button>
+                <button class="btn primary">Download</button>
+              </div>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-preview">ID Card Preview</div>
+            <div class="doc-body">
+              <div class="doc-title">ID_Card.jpg</div>
+              <div class="doc-actions">
+                <button class="btn">Preview</button>
+                <button class="btn primary">Download</button>
+              </div>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-preview">Residence Card</div>
+            <div class="doc-body">
+              <div class="doc-title">Residence_Card.pdf</div>
+              <div class="doc-actions">
+                <button class="btn">Preview</button>
+                <button class="btn primary">Download</button>
+              </div>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-preview">Insurance Card</div>
+            <div class="doc-body">
+              <div class="doc-title">Insurance_Card.png</div>
+              <div class="doc-actions">
+                <button class="btn">Preview</button>
+                <button class="btn primary">Download</button>
+              </div>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div class="doc-preview">Contract PDF</div>
+            <div class="doc-body">
+              <div class="doc-title">Contract_CNT-2026-1189.pdf</div>
+              <div class="doc-actions">
+                <button class="btn">Preview</button>
+                <button class="btn primary">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contract-information" class="card">
+        <h2>Contract Information</h2>
+        <div class="grid">
+          <div class="field"><span class="label">Contract Number</span><div class="value">CNT-2026-1189</div></div>
+          <div class="field"><span class="label">Contract Start Date</span><div class="value">2026-05-01</div></div>
+          <div class="field"><span class="label">Contract End Date</span><div class="value">2027-04-30</div></div>
+          <div class="field"><span class="label">Signed Date</span><div class="value">-</div></div>
+          <div class="field"><span class="label">Contract Status</span><div class="value">Pending Signature</div></div>
+        </div>
+      </section>
+
+      <section id="admin-memo" class="card">
+        <h2>Admin Memo</h2>
+        <textarea class="textarea-readonly" readonly>
+Candidate has completed all mandatory onboarding documents.
+Final signed contract still pending due to user travel schedule.
+Verify updated residence card scan submitted on 2026-04-28.
+Internal follow-up by payroll team required before month-end closing.</textarea>
+      </section>
+
+      <section id="approval-history" class="card">
+        <h2>Approval History</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <strong>User Submitted</strong>
+            <div class="sub">2026-04-12 10:14 - Submitted by Takashi Yamamoto</div>
+          </div>
+          <div class="timeline-item">
+            <strong>Manager Reviewed</strong>
+            <div class="sub">2026-04-15 16:32 - Reviewed by Naoko Fujita</div>
+          </div>
+          <div class="timeline-item">
+            <strong>Admin Approved</strong>
+            <div class="sub">2026-04-21 11:10 - Approved by HR Admin Team</div>
+          </div>
+          <div class="timeline-item">
+            <strong>Contract Signed</strong>
+            <div class="sub">Pending - awaiting employee e-signature</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="audit-log" class="card">
+        <h2>Audit Log</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Changed By</th>
+                <th>Changed At</th>
+                <th>Field Name</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Naoko Fujita (Manager)</td>
+                <td>2026-04-15 16:30</td>
+                <td>Department</td>
+                <td>Sales Support</td>
+                <td>Operations</td>
+              </tr>
+              <tr>
+                <td>HR Admin (Y. Kondo)</td>
+                <td>2026-04-21 11:05</td>
+                <td>Approval Status</td>
+                <td>Manager Reviewed</td>
+                <td>Approved</td>
+              </tr>
+              <tr>
+                <td>Takashi Yamamoto</td>
+                <td>2026-04-28 18:11</td>
+                <td>Residence Card</td>
+                <td>RC-OLD-99231</td>
+                <td>RC-8129-5551-3321</td>
+              </tr>
+              <tr>
+                <td>Payroll Admin</td>
+                <td>2026-04-29 09:42</td>
+                <td>Monthly Salary</td>
+                <td>JPY 372,000</td>
+                <td>JPY 385,000</td>
+              </tr>
+              <tr>
+                <td>System</td>
+                <td>2026-04-29 09:43</td>
+                <td>Updated At</td>
+                <td>2026-04-28 18:11</td>
+                <td>2026-04-29 09:43</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-card">
+        <h3 class="panel-title">Status Box</h3>
+        <div class="pill-group">
+          <span class="pill new">New</span>
+          <span class="pill">Save Draft</span>
+          <span class="pill waiting">Waiting</span>
+          <span class="pill approved">Approved</span>
+          <span class="pill rejected">Rejected</span>
+          <span class="pill signed">Signed</span>
+          <span class="pill completed">Completed</span>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3 class="panel-title">Role Box</h3>
+        <div class="pill-group">
+          <span class="pill">User</span>
+          <span class="pill">Cast</span>
+          <span class="pill">Manager</span>
+          <span class="pill approved">Admin</span>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3 class="panel-title">Actions</h3>
+        <div class="action-group">
+          <button class="btn success">Approve</button>
+          <button class="btn danger">Reject</button>
+          <button class="btn warn">Revert</button>
+          <button class="btn info">Save Draft</button>
+          <button class="btn primary">Mark as Signed</button>
+          <button class="btn">Change Role</button>
+          <button class="btn">Edit Information</button>
+          <button class="btn">Download All Files</button>
+          <button class="btn">Export PDF</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function () {
+      const links = document.querySelectorAll(".section-nav a");
+      const sections = Array.from(links).map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+
+      function setActive() {
+        const y = window.scrollY + 180;
+        let current = sections[0];
+
+        for (const sec of sections) {
+          if (sec.offsetTop <= y) current = sec;
+        }
+
+        links.forEach(link => {
+          const active = link.getAttribute("href") === "#" + current.id;
+          link.style.background = active ? "#dbeafe" : "";
+          link.style.color = active ? "#1d4ed8" : "";
+          link.style.borderColor = active ? "#bfdbfe" : "";
+          link.style.fontWeight = active ? "700" : "500";
+        });
+      }
+
+      window.addEventListener("scroll", setActive, { passive: true });
+      setActive();
+    })();
+  </script>
+</body>
+</html>
